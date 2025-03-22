@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import { userRouter } from "./routes/user";
 import { authRouter } from "./routes/auth";
-import {loginSchema} from "@payDam/shared-zod"
 
 const app = express();
 const PORT = process.env.PORT || 3000
