@@ -18,16 +18,18 @@ export const AuthController = {
                 if (isPasswordMatch) {
                     emailOfUser = account.email ;
                 } else {
-                    return res.status(402).json({
+                     res.status(402).json({
                         success : false  ,
                         message : "Invalid Crendetials"
                     })
+                    return 
                 }
             } else {
-                return res.status(402).json({
+                res.status(402).json({
                     success : false , 
                     message : "Invalid Credentials"
                 })
+                return 
             }
         }
         // while veriying the email 
@@ -39,16 +41,18 @@ export const AuthController = {
                 if (isPasswordMatch) {
                     emailOfUser = account.email ;
                 } else {
-                    return res.status(402).json({
+                    res.status(402).json({
                         success : false  ,
                         message : "Invalid Crendetials"
                     })
+                    return 
                 }
             } else {
-                return res.status(402).json({
+                res.status(402).json({
                     success : false , 
                     message : "Invalid Credentials"
                 })
+                return 
             }
         }
         var token = jwt.sign({ email : emailOfUser }, process.env.JWT_SECRET || 'CREAMSTONE');
@@ -67,10 +71,11 @@ export const AuthController = {
             const accountWithEmail = await findAccountWithEmail(email) 
             const  accountWithPn = await findAccountWithPhoneNumber(phoneNumber) 
             if (accountWithEmail?.id || accountWithPn?.id) {
-                return res.status(409).json({
+                res.status(409).json({
                     success : false ,
                     message : "User with email or phone number already exists"
                 })
+                return ;
             }
             // Generate a random 10-digit account number
             const accountNumber = Math.floor(1000000000 + Math.random() * 9000000000);
@@ -82,6 +87,7 @@ export const AuthController = {
                     success : true ,
                     message : "User registered successfully",
                 })
+                return ;
             }
         } catch (error) {
             console.error("Error in RegisterUser:" , error);

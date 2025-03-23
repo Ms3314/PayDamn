@@ -53,9 +53,7 @@ export const CheckTokenExist = (
     return;
   }
 
-  jwt.verify(
-    token,
-    process.env.SECRET_KEY || "pineapple",
+  jwt.verify( token, process.env.SECRET_KEY || "pineapple",
     async (err, decoded) => {
       if (err || !decoded || typeof decoded !== "object") {
         return res.status(403).json({
