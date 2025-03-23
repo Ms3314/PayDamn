@@ -11,7 +11,6 @@ export async function registerModel (fullName:string,email:string , password:str
                 password , 
                 phoneNumber ,
                 accountNumber,
-                cardnumber : accountNumber ,
             }
         });
         if(response) {

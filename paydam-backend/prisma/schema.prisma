@@ -16,9 +16,9 @@ datasource db {
 model User {
   id            Int @id @default(autoincrement())
   fullName      String 
-  cardnumber    Int 
   email         String 
   password      String 
   phoneNumber   Int
-  accountNumber Int
+  accountNumber BigInt @unique
+  balance       BigInt @default(9000)
 }
