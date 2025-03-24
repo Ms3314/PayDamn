@@ -18,7 +18,7 @@ model User {
   fullName      String 
   email         String 
   password      String 
-  phoneNumber   Int
-  accountNumber Int @unique
-  balance       Int @default(9000)
+  phoneNumber   BigInt
+  accountNumber BigInt @unique
+  balance       BigInt @default(9000)
 }

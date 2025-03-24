@@ -1,12 +1,13 @@
 import { PrismaClient } from "@prisma/client";
+import { getUsersModel } from "./userModels";
 const prisma = new PrismaClient();
 
 
-export async function BalanceMoney (myaccount : number) {
+export async function BalanceMoney (userid : number) {
     try {
         const data = await prisma.user.findUnique({
             where : {
-                accountNumber : myaccount ,
+                id : userid ,
             }
         })
         if(data) {
@@ -22,11 +23,11 @@ export async function BalanceMoney (myaccount : number) {
     }
 }
 
-export async function transferMoney (myaccount:number , transferee:number , amount:number) {
+export async function transferMoney (userid:number , transferee:number , amount:number) {
     try {
         const transaction = await prisma.$transaction([
             prisma.user.update({
-                where : {accountNumber : myaccount},
+                where : {id : userid},
                 data : {balance : {decrement : amount }} ,
             }) ,
             prisma.user.update({

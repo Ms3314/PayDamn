@@ -7,6 +7,8 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const user_1 = require("./routes/user");
 const auth_1 = require("./routes/auth");
+const dotenv_1 = __importDefault(require("dotenv")); // Import dotenv
+dotenv_1.default.config(); // Load environment variables from .env
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 3000;
 //middleware 
