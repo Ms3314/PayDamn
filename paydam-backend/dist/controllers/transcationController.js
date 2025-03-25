@@ -44,26 +44,27 @@ exports.transcationController = {
                     return;
                 }
             }
-            const transfer = yield (0, transferModel_1.transferMoney)(Number(userid), transferee, amount);
-            if (transfer === null || transfer === void 0 ? void 0 : transfer.success) {
+            // creates a trasaction in the schema
+            const createReciept = yield (0, transferModel_1.createTransaction)((userSendee === null || userSendee === void 0 ? void 0 : userSendee.accountNumber) || "", amount, transferee);
+            if (createReciept === null || createReciept === void 0 ? void 0 : createReciept.success) {
                 res.status(200).json({
                     success: true,
                     message: `Transfer successful to AC: ${transferee}`,
-                    balance: transfer.balance.toString(), // Return transaction details
+                    balance: createReciept.balance.toString(), // Return transaction details
                 });
                 return;
             }
             res.status(400).json({
                 success: false,
-                message: (transfer === null || transfer === void 0 ? void 0 : transfer.message) || "Transfer failed",
+                message: (createReciept === null || createReciept === void 0 ? void 0 : createReciept.message) || "Transfer failed",
             });
             return;
         }
         catch (error) {
             res.status(500).json({
                 success: false,
-                message: "Internal server error",
-                error,
+                message: "Internal server error while transfering amount ",
+                error: error.message,
             });
             return;
         }
@@ -72,14 +73,7 @@ exports.transcationController = {
         try {
             const userid = req.user;
             const data = yield (0, transferModel_1.BalanceMoney)(Number(userid));
-            if (data == false) {
-                res.status(402).json({
-                    success: false,
-                    message: "Error finding data"
-                });
-                return;
-            }
-            else if (data.balance) {
+            if (data.balance) {
                 res.status(200).json({
                     success: true,
                     balance: (data.balance).toString(),

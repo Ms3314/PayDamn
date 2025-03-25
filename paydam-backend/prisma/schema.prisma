@@ -14,11 +14,26 @@ datasource db {
 }
 
 model User {
-  id            Int @id @default(autoincrement())
-  fullName      String 
-  email         String 
-  password      String 
-  phoneNumber   String
-  accountNumber String @unique
-  balance       BigInt @default(9000)
+  id          Int          @id @default(autoincrement())
+  fullName    String
+  email       String       @unique
+  password    String
+  phoneNumber String       @unique
+  accountNumber String     @unique
+  balance     BigInt       @default(9000)
+
+  transactionsSent     Transaction[] @relation("Sender")
+  transactionsReceived Transaction[] @relation("Receiver")
+}
+
+model Transaction {
+  id          Int     @id @default(autoincrement())
+  amount      Float
+  senderId    String // this si technically the acc number 
+  receiverId  String // this is technically the acc number 
+  progress    Boolean 
+  createdAt   DateTime @default(now())
+
+  sender   User @relation("Sender", fields: [senderId], references: [accountNumber])
+  receiver User @relation("Receiver", fields: [receiverId], references: [accountNumber])
 }

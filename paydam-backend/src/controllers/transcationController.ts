@@ -1,7 +1,8 @@
-import { BalanceMoney, transferMoney } from "../models/transferModel";
+import { BalanceMoney, createTransaction, transferMoney } from "../models/transferModel";
 import { Response , Request } from "express";
 import { transferSchema } from "../zod/transferSchema";
 import { userAccountbyId } from "../models/userModels";
+import { create } from "domain";
 
 interface CostumRequest extends Request {
     user : String ;
@@ -49,26 +50,28 @@ export const transcationController = {
                     return ;
                 }
             }
-            const transfer = await transferMoney(Number(userid), transferee, amount);
-            if (transfer?.success) {
+            // creates a trasaction in the schema
+            const createReciept = await createTransaction(userSendee?.accountNumber || "" , amount , transferee )
+            
+            if (createReciept?.success) {
                 res.status(200).json({
                     success: true,
                     message: `Transfer successful to AC: ${transferee}`,
-                    balance: transfer.balance.toString(), // Return transaction details
+                    balance: createReciept.balance.toString(), // Return transaction details
                 });
                 return ;
             }
 
             res.status(400).json({
                 success: false,
-                message: transfer?.message || "Transfer failed",
+                message: createReciept?.message || "Transfer failed",
             });
             return 
-        } catch (error) {
+        } catch (error:any) {
             res.status(500).json({
                 success: false,
-                message: "Internal server error",
-                error,
+                message: "Internal server error while transfering amount ",
+                error : error.message,
             });
             return 
         }
@@ -77,13 +80,7 @@ export const transcationController = {
         try {
             const userid = req.user;
             const data = await BalanceMoney(Number(userid))
-            if (data == false) {
-                res.status(402).json({
-                    success : false ,
-                    message : "Error finding data"
-                })
-                return ;
-            } else if (data.balance) {
+            if (data.balance) {
                 res.status(200).json({
                     success : true ,
                     balance : (data.balance).toString() ,
