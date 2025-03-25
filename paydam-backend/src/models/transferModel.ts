@@ -23,7 +23,7 @@ export async function BalanceMoney (userid : number) {
     }
 }
 
-export async function transferMoney (userid:number , transferee:number , amount:number) {
+export async function transferMoney (userid:number , transferee:string , amount:number) {
     try {
         const transaction = await prisma.$transaction([
             prisma.user.update({
@@ -40,7 +40,7 @@ export async function transferMoney (userid:number , transferee:number , amount:
             return {
                 success : true ,
                 message : "Transfer successfull",
-                transaction ,
+                balance : transaction[0].balance.toString() , // MY BALANCE 
             }
         }
     } catch (error) {

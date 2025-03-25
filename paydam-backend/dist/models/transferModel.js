@@ -52,7 +52,7 @@ function transferMoney(userid, transferee, amount) {
                 return {
                     success: true,
                     message: "Transfer successfull",
-                    transaction,
+                    balance: transaction[0].balance.toString(), // MY BALANCE 
                 };
             }
         }

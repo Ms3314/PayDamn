@@ -2,14 +2,14 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 
-export async function registerModel (fullName:string,email:string , password:string , phoneNumber:string , accountNumber:number)  {
+export async function registerModel (fullName:string,email:string , password:string , phoneNumber:string , accountNumber:string)  {
     try {
         const response = await prisma.user.create({
             data: {
                 fullName ,
                 email ,
                 password , 
-                phoneNumber : parseInt(phoneNumber) ,
+                phoneNumber : phoneNumber ,
                 accountNumber,
             }
         });
@@ -22,14 +22,13 @@ export async function registerModel (fullName:string,email:string , password:str
     
 }
 
-export async function findAccountWithPhoneNumber (phoneNumber : number) {
+export async function findAccountWithPhoneNumber (phoneNumber : string) {
     try {
         const data = await prisma.user.findFirst({
             where : {
                 phoneNumber : phoneNumber 
             }
         })
-        console.log(data , "this is data")
         return data
     } catch (error) {
         throw new Error("Error while finding phone number" + error)

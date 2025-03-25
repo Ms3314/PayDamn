@@ -3,11 +3,9 @@ import { z } from "zod";
 // Define a schema for user signup/login
 export const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email format" }).optional(),
-  phoneNumber: z.number()
-    .int()
-    .gte(6000000000) // Minimum valid Indian phone number
-    .lte(9999999999) // Maximum valid Indian phone number
-    .optional(),
+  phoneNumber: z.string().regex(
+    /^[6789]\d{9}$/, 
+    "Invalid phone number (must be 10 digits, start with 6-9, India format)").optional(),
   password: z
     .string()
     .min(8, { message: "Password must be at least 8 characters long" })

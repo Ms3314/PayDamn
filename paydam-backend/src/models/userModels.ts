@@ -14,3 +14,19 @@ export async function getUsersModel () {
     }
 }
 
+
+export async function userAccountbyId (userid : number) {
+    try {
+        const userbyId = await prisma.user.findUnique({
+            where : {
+                id : userid
+            }
+        })
+        if (userbyId) {
+            return userbyId 
+        }
+        
+    } catch (error) {
+        throw new Error("Error finding the user" + error);
+    }
+}

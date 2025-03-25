@@ -11,7 +11,7 @@ export const AuthController = {
         let emailOfUser ;
         // while verifying the phone number 
         if (phoneNumber != '') {
-            const account =  await findAccountWithPhoneNumber(email)
+            const account =  await findAccountWithPhoneNumber(phoneNumber)
             if (account?.password) {
                 const isPasswordMatch = await bcrypt.compare(password, account?.password); // true
                 // email aur password sahi hai , abh bas dalna hai 
@@ -78,8 +78,8 @@ export const AuthController = {
                 return ;
             }
             // Generate a random 10-digit account number
-            const accountNumber = Math.floor(1000000000 + Math.random() * 9000000000);
-    
+            const accountNumber = Math.floor(1000000000 + Math.random() * 9000000000).toString();
+            
             // Save user to database
             const response = await registerModel(fullName, email, hashedPassword, phoneNumber, accountNumber);
             if (response) {
@@ -90,7 +90,6 @@ export const AuthController = {
                 return ;
             }
         } catch (error) {
-            console.error("Error in RegisterUser:" , error);
             res.status(500).json({error : "Internal error occured"})
         }
     }

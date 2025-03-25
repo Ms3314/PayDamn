@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getUsersModel = getUsersModel;
+exports.userAccountbyId = userAccountbyId;
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 function getUsersModel() {
@@ -25,6 +26,23 @@ function getUsersModel() {
         }
         catch (error) {
             throw new Error("Error whiile getting all the Users");
+        }
+    });
+}
+function userAccountbyId(userid) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const userbyId = yield prisma.user.findUnique({
+                where: {
+                    id: userid
+                }
+            });
+            if (userbyId) {
+                return userbyId;
+            }
+        }
+        catch (error) {
+            throw new Error("Error finding the user" + error);
         }
     });
 }

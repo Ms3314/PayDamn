@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.transcationController = void 0;
 const transferModel_1 = require("../models/transferModel");
 const transferSchema_1 = require("../zod/transferSchema");
+const userModels_1 = require("../models/userModels");
 exports.transcationController = {
     TransferAmount: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         try {
@@ -26,12 +27,29 @@ exports.transcationController = {
                 });
                 return;
             }
+            const userSendee = yield (0, userModels_1.userAccountbyId)(Number(userid));
+            if (userSendee) {
+                if ((userSendee === null || userSendee === void 0 ? void 0 : userSendee.balance) < amount) {
+                    res.status(400).json({
+                        success: false,
+                        message: "Insufficient balance",
+                    });
+                    return;
+                }
+                else if ((userSendee === null || userSendee === void 0 ? void 0 : userSendee.accountNumber) == transferee) {
+                    res.status(403).json({
+                        success: false,
+                        message: "You cannot send money to yourself"
+                    });
+                    return;
+                }
+            }
             const transfer = yield (0, transferModel_1.transferMoney)(Number(userid), transferee, amount);
             if (transfer === null || transfer === void 0 ? void 0 : transfer.success) {
                 res.status(200).json({
                     success: true,
-                    message: "Transfer successful",
-                    transaction: transfer.transaction, // Return transaction details
+                    message: `Transfer successful to AC: ${transferee}`,
+                    balance: transfer.balance.toString(), // Return transaction details
                 });
                 return;
             }
@@ -42,7 +60,6 @@ exports.transcationController = {
             return;
         }
         catch (error) {
-            console.error("Transaction error:", error);
             res.status(500).json({
                 success: false,
                 message: "Internal server error",
@@ -63,7 +80,6 @@ exports.transcationController = {
                 return;
             }
             else if (data.balance) {
-                console.log(data.balance);
                 res.status(200).json({
                     success: true,
                     balance: (data.balance).toString(),
@@ -73,7 +89,6 @@ exports.transcationController = {
             }
         }
         catch (error) {
-            console.error("Transaction error:", error);
             res.status(500).json({
                 success: false,
                 message: "Internal server error",

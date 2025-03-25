@@ -6,7 +6,6 @@ import { findAccountWithEmail } from "../models/authModel";
 export const loginValidate = (req : Request , res : Response , next : NextFunction) : void  => {
     const result = loginSchema.safeParse(req.body);
          // is this is not a success 
-        console.log(result.error)
         if (!result.success) {
             res.status(400).json({errors : result.error.format() });
             return  ;
@@ -53,10 +52,8 @@ export const CheckTokenExist = (
     });
     return;
   }
-  console.log(token , "this is the token")
   jwt.verify( token, process.env.JWT_SECRET || "pineapple",
     async (err, decoded) => {
-      console.log( decoded)
       if (err || !decoded || typeof decoded !== "object") {
         return res.status(403).json({
           success: false,
@@ -76,7 +73,6 @@ export const CheckTokenExist = (
         }
 
         req.user = account.id;
-        console.log(req.user , typeof req.user);
         next();
       } catch (error) {
         return res.status(500).json({

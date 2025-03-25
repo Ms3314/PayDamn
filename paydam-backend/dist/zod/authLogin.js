@@ -5,11 +5,7 @@ const zod_1 = require("zod");
 // Define a schema for user signup/login
 exports.loginSchema = zod_1.z.object({
     email: zod_1.z.string().email({ message: "Invalid email format" }).optional(),
-    phoneNumber: zod_1.z.number()
-        .int()
-        .gte(6000000000) // Minimum valid Indian phone number
-        .lte(9999999999) // Maximum valid Indian phone number
-        .optional(),
+    phoneNumber: zod_1.z.string().regex(/^[6789]\d{9}$/, "Invalid phone number (must be 10 digits, start with 6-9, India format)").optional(),
     password: zod_1.z
         .string()
         .min(8, { message: "Password must be at least 8 characters long" })

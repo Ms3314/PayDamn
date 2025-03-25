@@ -23,7 +23,7 @@ exports.AuthController = {
         let emailOfUser;
         // while verifying the phone number 
         if (phoneNumber != '') {
-            const account = yield (0, authModel_1.findAccountWithPhoneNumber)(email);
+            const account = yield (0, authModel_1.findAccountWithPhoneNumber)(phoneNumber);
             if (account === null || account === void 0 ? void 0 : account.password) {
                 const isPasswordMatch = yield bcryptjs_1.default.compare(password, account === null || account === void 0 ? void 0 : account.password); // true
                 // email aur password sahi hai , abh bas dalna hai 
@@ -93,7 +93,7 @@ exports.AuthController = {
                 return;
             }
             // Generate a random 10-digit account number
-            const accountNumber = Math.floor(1000000000 + Math.random() * 9000000000);
+            const accountNumber = Math.floor(1000000000 + Math.random() * 9000000000).toString();
             // Save user to database
             const response = yield (0, authModel_1.registerModel)(fullName, email, hashedPassword, phoneNumber, accountNumber);
             if (response) {
@@ -105,7 +105,6 @@ exports.AuthController = {
             }
         }
         catch (error) {
-            console.error("Error in RegisterUser:", error);
             res.status(500).json({ error: "Internal error occured" });
         }
     })

@@ -22,7 +22,6 @@ export const userController = {
             });
             return 
         } catch (error) {
-            console.error("Error fetching users:", error);
 
             res.status(500).json({
                 success: false,

@@ -22,7 +22,7 @@ function registerModel(fullName, email, password, phoneNumber, accountNumber) {
                     fullName,
                     email,
                     password,
-                    phoneNumber: parseInt(phoneNumber),
+                    phoneNumber: phoneNumber,
                     accountNumber,
                 }
             });
@@ -43,7 +43,6 @@ function findAccountWithPhoneNumber(phoneNumber) {
                     phoneNumber: phoneNumber
                 }
             });
-            console.log(data, "this is data");
             return data;
         }
         catch (error) {

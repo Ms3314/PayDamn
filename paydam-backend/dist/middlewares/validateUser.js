@@ -19,7 +19,6 @@ const authModel_1 = require("../models/authModel");
 const loginValidate = (req, res, next) => {
     const result = authLogin_1.loginSchema.safeParse(req.body);
     // is this is not a success 
-    console.log(result.error);
     if (!result.success) {
         res.status(400).json({ errors: result.error.format() });
         return;
@@ -50,9 +49,7 @@ const CheckTokenExist = (req, res, next) => {
         });
         return;
     }
-    console.log(token, "this is the token");
     jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET || "pineapple", (err, decoded) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log(decoded);
         if (err || !decoded || typeof decoded !== "object") {
             return res.status(403).json({
                 success: false,
@@ -69,7 +66,6 @@ const CheckTokenExist = (req, res, next) => {
                 });
             }
             req.user = account.id;
-            console.log(req.user, typeof req.user);
             next();
         }
         catch (error) {

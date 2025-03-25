@@ -1,9 +1,21 @@
 import { BalanceMoney, transferMoney } from "../models/transferModel";
 import { Response , Request } from "express";
 import { transferSchema } from "../zod/transferSchema";
+import { userAccountbyId } from "../models/userModels";
 
 interface CostumRequest extends Request {
     user : String ;
+}
+
+interface userAccount {
+    id: number;
+    fullName: string;
+    email: string;
+    password: string;
+    phoneNumber: string;
+    accountNumber: string;
+    balance: bigint;
+
 }
 
 export const transcationController = {
@@ -21,14 +33,28 @@ export const transcationController = {
                 });
                 return ;
             }
-
+            const userSendee  = await userAccountbyId(Number(userid))
+            if (userSendee) {
+                if (userSendee?.balance < amount) {
+                    res.status(400).json({
+                        success: false,
+                        message: "Insufficient balance",
+                    });
+                    return ;
+                } else if (userSendee?.accountNumber == transferee){
+                    res.status(403).json({
+                        success : false ,
+                        message : "You cannot send money to yourself"
+                    })
+                    return ;
+                }
+            }
             const transfer = await transferMoney(Number(userid), transferee, amount);
-
             if (transfer?.success) {
                 res.status(200).json({
                     success: true,
-                    message: "Transfer successful",
-                    transaction: transfer.transaction, // Return transaction details
+                    message: `Transfer successful to AC: ${transferee}`,
+                    balance: transfer.balance.toString(), // Return transaction details
                 });
                 return ;
             }
@@ -39,7 +65,6 @@ export const transcationController = {
             });
             return 
         } catch (error) {
-            console.error("Transaction error:", error);
             res.status(500).json({
                 success: false,
                 message: "Internal server error",
@@ -59,7 +84,6 @@ export const transcationController = {
                 })
                 return ;
             } else if (data.balance) {
-                console.log(data.balance)
                 res.status(200).json({
                     success : true ,
                     balance : (data.balance).toString() ,
@@ -68,7 +92,6 @@ export const transcationController = {
                 return ;
             }
         } catch (error) {
-            console.error("Transaction error:", error);
             res.status(500).json({
                 success: false,
                 message: "Internal server error",
