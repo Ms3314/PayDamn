@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.17",
+    "@types/jsonwebtoken": "^9.0.9",
     "axios": "^1.8.4",
+    "jsonwebtoken": "^9.0.2",
     "react": "18.0.0",
     "react-dom": "18.0.0",
     "react-query": "^3.39.3",

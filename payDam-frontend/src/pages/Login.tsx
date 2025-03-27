@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { z } from 'zod';
-import axios from 'axios';
+// import axios from 'axios';
 import { Link } from 'react-router-dom';
 
 // Zod schema for login input
@@ -74,12 +74,12 @@ const LoginPage: React.FC = () => {
         setIsLoading(false);
         return;
       }
-
+      console.log(formData , "this is the form datas")
       // If validation passes, proceed with login
-      const response = await axios.post('/api/login', formData);
+      // const response = await axios.post('/api/login', formData);
       
       // Handle successful login
-      console.log('Login successful', response.data);
+      // console.log('Login successful', response.data);
       // Add logic for successful login (e.g., store token, redirect)
     } catch (err) {
       // Handle login error
@@ -92,7 +92,7 @@ const LoginPage: React.FC = () => {
 
   return (
     <div className="flex min-h-screen bg-black">
-      <div className="w-1/2 flex items-center justify-center">
+      <div className="w-full lg:w-1/2 flex items-center justify-center">
         <form 
           onSubmit={handleSubmit} 
           className="w-full max-w-md p-8 space-y-4"
@@ -157,7 +157,7 @@ const LoginPage: React.FC = () => {
           <Link to="/register" className='text-slate-300 text-lg'>New to PayDam ? Register</Link>
         </form>
       </div>
-      <div className="w-1/2 bg-zinc-900 flex flex-col items-center justify-center">
+      <div className="w-1/2 hidden  bg-zinc-900 lg:flex flex-col items-center justify-center">
         <h1 className="text-white text-4xl font-bold">PayDam</h1>
         <p className='text-slate-300 text-lg'>A Transactions Web App </p>
       </div>
