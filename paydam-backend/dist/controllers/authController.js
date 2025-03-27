@@ -107,5 +107,25 @@ exports.AuthController = {
         catch (error) {
             res.status(500).json({ error: "Internal error occured" });
         }
+    }),
+    isValidToken: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            // @ts-ignore
+            const { user } = req.user;
+            if (user) {
+                res.status(200).json({
+                    success: true,
+                    message: "Token is valid"
+                });
+                return;
+            }
+        }
+        catch (error) {
+            res.status(404).json({
+                success: false,
+                message: "Token is invalid"
+            });
+            return;
+        }
     })
 };

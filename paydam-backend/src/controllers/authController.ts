@@ -2,6 +2,7 @@ import { Request , Response } from "express";
 import bcrypt from "bcryptjs"
 import { findAccountWithEmail, findAccountWithPhoneNumber, registerModel } from "../models/authModel";
 import jwt from "jsonwebtoken"; 
+import { isValid } from "zod";
 
 
 export const AuthController = {
@@ -91,6 +92,26 @@ export const AuthController = {
             }
         } catch (error) {
             res.status(500).json({error : "Internal error occured"})
+        }
+    },
+    isValidToken : async (req:Request , res:Response) => {
+        try {
+            // @ts-ignore
+            const {user} = req.user ;
+            if (user) {
+                res.status(200).json({
+                    success : true ,
+                    message : "Token is valid"
+                })
+                return ;
+            }
+        }
+        catch (error) {
+            res.status(404).json({
+                success : false ,
+                message : "Token is invalid"
+            })
+            return ;
         }
     }
     
