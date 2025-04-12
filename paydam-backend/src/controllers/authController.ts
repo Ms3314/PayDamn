@@ -1,9 +1,14 @@
 import { Request , Response } from "express";
 import bcrypt from "bcryptjs"
 import { findAccountWithEmail, findAccountWithPhoneNumber, registerModel } from "../models/authModel";
-import jwt from "jsonwebtoken"; 
+import jwt, { JsonWebTokenError, JwtPayload } from "jsonwebtoken"; 
 import { isValid } from "zod";
+import path from "path";
 
+interface DecodedToken {
+    email: string;
+  }
+  
 
 export const AuthController = {
     // the plan is make the user signin using his email and pasword then it will get a 2FA 
@@ -11,7 +16,7 @@ export const AuthController = {
         const {email , phoneNumber , password} = req.body ;
         let emailOfUser ;
         // while verifying the phone number 
-        if (phoneNumber != '') {
+        if (phoneNumber != undefined && phoneNumber != null && phoneNumber != '') {
             const account =  await findAccountWithPhoneNumber(phoneNumber)
             if (account?.password) {
                 const isPasswordMatch = await bcrypt.compare(password, account?.password); // true
@@ -34,7 +39,7 @@ export const AuthController = {
             }
         }
         // while veriying the email 
-        if (email != '') {
+        if (email && undefined || email && null || email && '') {
             const account =  await findAccountWithEmail(email)
             if (account?.password) {
                 const isPasswordMatch = await bcrypt.compare(password, account?.password); // true
@@ -56,13 +61,20 @@ export const AuthController = {
                 return 
             }
         }
-        var token = jwt.sign({ email : emailOfUser }, process.env.JWT_SECRET || 'CREAMSTONE');
+        var access_token = jwt.sign({ email : emailOfUser }, process.env.ACCESS_SECRET || 'CREAMSTONE' , { expiresIn : '15m'});
+        var refresh_token = jwt.sign({ email : emailOfUser }, process.env.REFRESH_SECRET || 'CREAMSTONE' , { expiresIn : '15m'});
+        res.cookie('refreshToken', refresh_token, {
+            httpOnly: true,
+            secure: true, // Use only over HTTPS
+            sameSite: 'strict',
+            path: '/refresh-token',
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+          });
         res.status(200).json({
             success : true ,
             message : "User has been logged in",
-            token ,
+            accesstoken : access_token ,
         })
-        
     },
     RegisterUser: async (req: Request, res: Response) => {
         try {
@@ -113,6 +125,50 @@ export const AuthController = {
             })
             return ;
         }
+    },
+    refreshToken : async (req:Request , res:Response) => {
+        try {
+            const refreshToken = req.cookies.refreshToken;
+            if (!refreshToken) {
+                return res.status(401).json({ message: 'Refresh token not found' });
+            }
+            jwt.verify(refreshToken, process.env.REFRESH_SECRET || 'GORILLA' , async (err : JsonWebTokenError | null , decoded : string | JwtPayload | undefined) => {
+                    if (err) {
+                        return res.status(401).json({
+                            success : false ,
+                            message : "Invalid refresh token "
+                        })
+                    }
+                    const { email } = decoded as DecodedToken;
+                    var newaccess_token = jwt.sign({ email  }, process.env.ACCESS_SECRET || 'CREAMSTONE' , { expiresIn : '15m'});
+                    return res.status(200).json({
+                        success : true ,
+                        access_token : newaccess_token
+                    })
+            })
+        }
+        catch (error) {
+            console.log(error)
+            return res.status(500).json({
+                success : false ,
+                message : "refresh token authorization failed , internal server error"
+            })
+        }
+    },
+    LogoutUser : async (req:Request , res:Response) => {
+        try {
+            res.clearCookie('refreshToken' , {path : '/refresh-token'});
+            return res.status(200).json({
+                success : true ,
+                message : "User has been logged out"
+            })
+        } catch (error) {
+            res.status(500).json({
+                success : false ,
+                message : "Error while logging out",
+                error
+            })
+        }
     }
-    
 }
+    

@@ -1,6 +1,6 @@
 import { NextFunction , Response , Request, response } from "express";
 import { loginSchema } from "../zod/authLogin"
-import jwt from "jsonwebtoken"
+import jwt, { JsonWebTokenError, JwtPayload } from "jsonwebtoken"
 import { findAccountWithEmail } from "../models/authModel";
 
 export const loginValidate = (req : Request , res : Response , next : NextFunction) : void  => {
@@ -52,35 +52,41 @@ export const CheckTokenExist = (
     });
     return;
   }
-  jwt.verify( token, process.env.JWT_SECRET || "pineapple",
-    async (err, decoded) => {
-      if (err || !decoded || typeof decoded !== "object") {
-        return res.status(403).json({
-          success: false,
-          message: "Invalid or expired token",
-        });
+  jwt.verify(token, process.env.JWT_SECRET || "pineapple", async (err: JsonWebTokenError | null,  decoded : string | JwtPayload | undefined) => {
+    if (err || !decoded || typeof decoded !== "object") {
+      // Token expired
+      if (err?.name === 'TokenExpiredError') {
+        return res.status(401).json({ message: 'Token expired' });
       }
 
-      try {
-        const { email } = decoded as DecodedToken;
-        const account = await findAccountWithEmail(email);
-
-        if (!account) {
-          return res.status(409).json({
-            success: false,
-            message: "Invalid token",
-          });
-        }
-        
-        req.user = account.id;
-        next();
-      } catch (error) {
-        return res.status(500).json({
-          success: false,
-          message: "Something went wrong",
-          error,
-        });
+      // Invalid token
+      if (err?.name === 'JsonWebTokenError') {
+        return res.status(402).json({ message: 'Invalid token' });
       }
+
+      // Some other error
+      return res.status(400).json({ message: 'Token verification failed' });
     }
-  );
+
+    try {
+      const { email } = decoded as DecodedToken;
+      const account = await findAccountWithEmail(email);
+      
+      if (!account) {
+        return res.status(401).json({
+          success: false,
+          message: "Invalid token",
+        });
+      }
+      
+      req.user = account.id;
+      next();
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: "Something went wrong",
+        error,
+      });
+    }
+  });
 };

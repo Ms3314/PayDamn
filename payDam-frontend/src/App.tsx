@@ -22,6 +22,7 @@ function App() {
   async function checkTokenAndSetState(token: string | null) {
     if (token && await isValidToken()) {
       setToken(token);
+      console.log(token , "this is the token")
       setDoesTokenExist(true);
     } else {
       setDoesTokenExist(false);
@@ -44,7 +45,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/" element={<LoginPage />} />
       </Routes>
     </Router>
   );

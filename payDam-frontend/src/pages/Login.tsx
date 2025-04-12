@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { z } from 'zod';
 // import axios from 'axios';
 import { Link } from 'react-router-dom';
+import axiosInstance from '../helpers/axiosInstance';
+import { useStore } from '../Zustand/store';
 
 // Zod schema for login input
 const LoginSchema = z.object({
@@ -33,9 +35,13 @@ const LoginPage: React.FC = () => {
     password?: string;
   }>({});
 
+  
+
   // Loading and general error states
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Move useStore call here
+  const setToken = useStore((state) => state.setToken);
 
   // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,11 +82,22 @@ const LoginPage: React.FC = () => {
       }
       console.log(formData , "this is the form datas")
       // If validation passes, proceed with login
-      // const response = await axios.post('/api/login', formData);
-      
+      const response = await axiosInstance.post('/api/v1/auth/login', formData);
+      if (response.status != 200) {
+        setIsLoading(false);
+        setError('Login failed. Please check your credentials.');
+        return;
+      }
       // Handle successful login
-      // console.log('Login successful', response.data);
+      console.log('Login successful', response.data);
       // Add logic for successful login (e.g., store token, redirect)
+
+      setToken(response.data.accesstoken);
+      // Clear form
+      setFormData({
+        identifier: '',
+        password: ''
+      });
     } catch (err) {
       // Handle login error
       console.error('Login failed', err);
@@ -149,16 +166,17 @@ const LoginPage: React.FC = () => {
 
           <button
             type="submit"
+            onClick={handleSubmit}
             disabled={isLoading}
             className="w-full p-2 bg-white text-black hover:bg-gray-200 transition-colors disabled:opacity-50"
           >
             {isLoading ? 'Logging in...' : 'Login'}
           </button>
-          <Link to="/register" className='text-slate-300 text-lg'>New to PayDam ? Register</Link>
+          <Link to="/register" className='text-slate-300 text-md'>New to PayDam ? Register</Link>
         </form>
       </div>
       <div className="w-1/2 hidden  bg-zinc-900 lg:flex flex-col items-center justify-center">
-        <h1 className="text-white text-4xl font-bold">PayDam</h1>
+        <h1 className="text-white text-3xl font-bold">PayDam</h1>
         <p className='text-slate-300 text-lg'>A Transactions Web App </p>
       </div>
     </div>

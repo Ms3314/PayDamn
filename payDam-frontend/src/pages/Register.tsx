@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 
 // Zod schema for registration validation
@@ -33,7 +33,7 @@ const RegisterPage: React.FC = () => {
     phoneNumber: '',
     password: ''
   });
-
+  const navigate = useNavigate();
   // Validation error state
   const [validationErrors, setValidationErrors] = useState<{
     fullname?: string;
@@ -90,9 +90,14 @@ const RegisterPage: React.FC = () => {
       }
 
       // If validation passes, proceed with registration
-      const response = await axios.post('/api/register', formData);
+      const response = await axios.post('/api/v1/auth/register', formData);
       
       // Handle successful registration
+      if (response.status !== 200) {
+        setSuccess(false);
+        setError('Registration failed. Please try again.');
+        return;
+      }
       console.log('Registration successful', response.data);
       setSuccess(true);
       // Clear form
@@ -102,6 +107,7 @@ const RegisterPage: React.FC = () => {
         phoneNumber: '',
         password: ''
       });
+      navigate('/');
     } catch (err) {
       // Handle registration error
       console.error('Registration failed', err);
@@ -224,7 +230,7 @@ const RegisterPage: React.FC = () => {
             {isLoading ? 'Registering...' : 'Register'}
           </button>
           
-          <Link to="/login" className='text-slate-300 text-lg'>
+          <Link to="/" className='text-slate-300 text-lg'>
             Already have an account? Login
           </Link>
         </form>

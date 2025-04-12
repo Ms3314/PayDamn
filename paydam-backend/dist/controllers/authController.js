@@ -22,7 +22,7 @@ exports.AuthController = {
         const { email, phoneNumber, password } = req.body;
         let emailOfUser;
         // while verifying the phone number 
-        if (phoneNumber != '') {
+        if (phoneNumber != undefined && phoneNumber != null && phoneNumber != '') {
             const account = yield (0, authModel_1.findAccountWithPhoneNumber)(phoneNumber);
             if (account === null || account === void 0 ? void 0 : account.password) {
                 const isPasswordMatch = yield bcryptjs_1.default.compare(password, account === null || account === void 0 ? void 0 : account.password); // true
@@ -47,7 +47,7 @@ exports.AuthController = {
             }
         }
         // while veriying the email 
-        if (email != '') {
+        if (email && undefined || email && null || email && '') {
             const account = yield (0, authModel_1.findAccountWithEmail)(email);
             if (account === null || account === void 0 ? void 0 : account.password) {
                 const isPasswordMatch = yield bcryptjs_1.default.compare(password, account === null || account === void 0 ? void 0 : account.password); // true
@@ -75,7 +75,7 @@ exports.AuthController = {
         res.status(200).json({
             success: true,
             message: "User has been logged in",
-            token,
+            accesstoken: token,
         });
     }),
     RegisterUser: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
